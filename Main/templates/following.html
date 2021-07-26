@@ -1,0 +1,75 @@
+{% extends 'discover.html'%}
+{% load static %}
+{% block follow %}
+<div class="left-feed">
+<div class="topic">
+    Following({{count_following}})
+</div>
+<div class="people-list">
+    <ul>
+        {% for i in others%}
+        <form class="n-follow" action="{% url 'discover_more' %}" method="post" id="{{i.pk}}">{% csrf_token %}
+        <input type="hidden" class="fllow_pk" name="follow_pk" value="{{i.pk}}">
+        <li>
+            <table>
+            {% for bio in userdata %}
+            {% if bio.owner_id == i.pk %}
+            {% if bio.profile_pic != '' %}
+            <td class="sp-pp"><img src="media/{{bio.profile_pic}}" width="50" height="50"></td>
+            {% else %}
+            <td class="sp-pp"><img src="{% static 'img/defaultpp.jpg' %}"></td>
+            {% endif %}
+            {% endif %}
+            {% endfor %}
+            <td class="sp-name"><a href="view_profile?id={{i.id}}" style="text-decoration: none; color: white;">{{i.first_name}} {{i.last_name}}</a></td>
+            <td class="sp-button">
+                {% if i in others%}
+                <button type="sumbit" id="un_show{{i.pk}}" class="side-after fllow{{i.pk}}">Following</button>
+                {% else %}
+                <button type="submit" class="side-r fllow{{i.pk}}">Follow</button>
+                {% endif %}
+            </table>
+        </li>
+        </form>
+        {% endfor %}
+    </ul>
+    </div>
+    </div>
+</div>
+    <script>
+        $('.n-follow').submit(function(e){
+            e.preventDefault()
+
+            const follow_id = $(this).attr('id')
+            const followText = $(`.fllow${follow_id}`).text()
+            const trim = $.trim(followText)
+            const url =$(this).attr('action')
+
+            $.ajax({
+                type:'POST',
+                url : url,
+                data:{
+                'csrfmiddlewaretoken':$('input[name=csrfmiddlewaretoken]').val(),
+                'follow_pk':follow_id
+                },
+                success:function(response){
+                if (trim === 'Follow'){
+
+                    $(`.fllow${follow_id}`).text('Following')
+
+
+                } else {
+
+                    $(`.fllow${follow_id}`).text('Follow')
+
+                }
+                },
+                error:function(response){
+                console.log('error',response)
+                }
+                });
+
+
+        });
+    </script>
+{% endblock %}

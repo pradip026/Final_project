@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html>
+    {% load static %}
+    <head>
+        <title>Spotster</title>
+        <link rel="stylesheet" id="header_css">
+        <link rel="stylesheet" id="layout_css">
+        <link rel="stylesheet" id="newsfeed_css">
+        <link rel="stylesheet" id="discover_css">
+        <link rel="stylesheet" id="trending_css">
+        <link rel="stylesheet" id="profile_css">
+        <link rel="stylesheet" id="video_css">
+        <link rel="stylesheet" href="{% static 'css/chatbox.css' %}">
+        <link rel="stylesheet" href="{% static 'css/preloader.css' %}">
+        <link rel="stylesheet" href="{% static 'css/post.css' %}">
+        <link href="https://api.mapbox.com/mapbox-gl-js/v2.2.0/mapbox-gl.css" rel="stylesheet">
+        <script src="https://api.mapbox.com/mapbox-gl-js/v2.2.0/mapbox-gl.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+        <link rel="icon" href="{% static 'img/icon.png' %}">
+    </head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% block bodyloader %}
+    {% endblock %}
+    <div class="fullloader" id="fullloader">
+        <div class="preloader">
+            <img class="animate-start" src="{% static 'icon/preloader.png' %}">
+        </div>
+        <script>
+            var theme = localStorage.getItem('theme');
+            if(theme == 'light'){ document.getElementById('fullloader').style.background='white';}
+        </script>
+    </div>
+        <div class="header_top" id="headert">
+            <table>
+
+                <!-- logo -->
+                <td class="logo">
+                    <button onclick="window.open('/','_self')">
+                        <img src="{% static 'img/icon2.png' %}">
+                    </button>
+                </td>
+
+
+                <td class="header_btns_div">
+                    <div class="header_btns_active" id="h-a">
+                        <a href="/"><img src="{% static 'icon/home.png' %}" class="header_m_img"></a>
+                    </div>
+                    <div class="header_btns" id="h-i">
+                        <a href="/"><img src="{% static 'icon/home-inactive.png' %}" class="header_m_img"></a>
+                    </div>
+                    <div class="header_btns_active" id="v-a">
+                        <a href="/video"><img src="{% static 'icon/video.png' %}" class="header_m_img"></a>
+                    </div>
+                    <div class="header_btns" id="v-i">
+                        <a href="/video"><img src="{% static 'icon/video-inactive.png' %}" class="header_m_img"></a>
+                    </div>
+                    <div class="header_btns_active" id="t-a">
+                        <a href="/trending"><img src="{% static 'icon/trending.png' %}" class="header_m_img"></a>
+                    </div>
+                    <div class="header_btns" id="t-i">
+                        <a href="/trending"><img src="{% static 'icon/trending-inactive.png' %}" class="header_m_img"></a>
+                    </div>
+                    <div class="header_btns_active" id="d-a">
+                        <a href="/discover"><img src="{% static 'icon/discover.png' %}" class="header_m_img"></a>
+                    </div>
+                    <div class="header_btns" id="d-i">
+                        <a href="/discover"><img src="{% static 'icon/discover-inactive.png' %}" class="header_m_img"></a>
+                    </div>
+                    <div class="header_btns_active mobile-nav-active" id="m-n-a">
+                        <a href=""><img src="{% static 'icon/menu.png' %}" class="header_menu_img"></a>
+                    </div>
+                    <div class="header_btns mobile-nav" id="m-n-i">
+                        <a onclick="show_side_nav()" class="nav-btn">
+                            <img src="{% static 'icon/menu-inactive.png' %}" class="header_m_img">
+                            <span class="badge-nav" id="b-m">1</span>
+                        </a>
+                    </div>
+                    <div id="side_nav">
+                        <div class="side_nav_modal">
+                          <div class="modaltop">
+                              <div class="modalheader">
+                                <span style="display:none; font-weight: bold;" id="back-side" onclick="document.getElementById('sm-content').style.display='block'; document.getElementById('search-mobile').style.display='none'; document.getElementById('back-side').style.display='none';">< Back</span>
+                              </div>
+                              <div class="closebutton">
+                                  <span onclick="document.getElementById('side_nav').style.display='none'; document.getElementById('m-n-i').style.display='inline-block'; document.getElementById('m-n-a').style.display='none';">&times;</span>
+                              </div>
+                            </div>
+                            <ul id="sm-content">
+                                <li class="sidemenu" style="margin-bottom: 10px;" onclick="document.getElementById('sm-content').style.display='none'; document.getElementById('search-mobile').style.display='block'; document.getElementById('back-side').style.display='block';">
+                                    <div class="navsidesearch">
+                                        <div class="new-idea">Search</div>
+                                    </div>
+                                </li>
+                                <li class="sidemenu" onclick="window.open('/profile','_self')">
+                                    
+                                    {% for i in user %}
+                                    <table>
+                                        {% if mydetials.profile_pic != '' %}
+                                        <td class="c1-img">
+                                            <img src="media/{{mydetials.profile_pic}}" style="width:50px; filter:none; box-shadow: 0 0 1px 3px #2d7b20" height="40" width="50">
+                                        </td>
+                                        {% else %}
+                                        <td class="c1-img">
+                                            <img src="{% static 'img/defaultpp.jpg' %}" style="width:50px; filter:none; box-shadow: 0 0 1px 3px #2d7b20;" >
+                                        </td>
+                                        {% endif %}
+                                        <td class="c1-label">
+                                            &emsp;{{i.first_name}} {{i.last_name}}
+                                            
+                                        </td>
+                                    </table>
+                                </li>
+                                {% endfor %}
+                                <li class="sidemenu" onclick="window.open('Follower', '_self')">
+                                    <table>
+                                        <td class="c1-img">
+                                            <img src="{% static 'icon/follower.png' %}">
+                                        </td>
+                                        <td class="c1-label">
+                                            &emsp;Followers(<span id="follower-count">{{count}}</span>)
+                                        </td>
+                                    </table>
+                                </li>
+                                <li class="sidemenu" onclick="window.open('Following', '_self')">
+                                    <table>
+                                        <td class="c1-img">
+                                            <img src="{% static 'icon/following.png' %}">
+                                        </td>
+                                        <td class="c1-label">
+                                            &emsp;Following(<span id="following-count">{{count_following}}</span>)
+                                        </td>
+                                    </table>
+                                </li>
+                                <li class="sidemenu" onclick="window.open('notification', '_self')">
+                                    <table>
+                                        <td class="c1-img">
+                                            <img src="{% static 'icon/notification.png' %}">
+                                        </td>
+                                        <td class="c1-label">
+                                            &emsp;<span>Notification</span>
+                                        </td>
+                                    </table>
+                                </li>
+                                <li class="sidemenu" onclick="window.open('saved', '_self')">
+                                    <table>
+                                        <td class="c1-img">
+                                            <img src="{% static 'icon/saved.png' %}">
+                                        </td>
+                                        <td class="c1-label">
+                                            &emsp;Saved
+                                        </td>
+                                    </table>
+                                </li>
+                                <li class="sidemenu" onclick="window.open('chatbox', '_self')">
+                                    <table>
+                                        <td class="c1-img">
+                                            <img src="{% static 'icon/message.png' %}">
+                                        </td>
+                                        <td class="c1-label">
+                                            &emsp;Chatbox
+                                       
+                           
+                        
+                                        </td>
+                                    </table>
+                                </li>
+
+                                <li class="sidemenu" id="dark_sidemenu">
+                                    <table>
+                                        <td class="c1-img">
+                                            <img src="{% static 'icon/dark.png' %}" style="filter:none">
+                                        </td>
+                                        <td class="c1-label">
+                                            &emsp;Dark Theme
+                                        </td>
+                                    </table>
+                                </li>
+                                <li class="sidemenu" id="light_sidemenu">
+                                    <table>
+                                        <td class="c1-img">
+                                            <img src="{% static 'icon/light.png' %}" style="filter: none;">
+                                        </td>
+                                        <td class="c1-label">
+                                            &emsp;Light Theme
+                                        </td>
+                                    </table>
+                                </li>
+                                <li class="sidemenu" onclick="window.open('/logout', '_self')">
+                                    <table>
+                                        <td class="c1-img">
+                                            <img class="header_propic" src="{% static 'icon/logout.png' %}">
+                                        </td>
+                                        <td class="c1-label">
+                                            &emsp;Logout
+                                        </td>
+                                    </table>
+                                </li>
+                            </ul>
+                            <div id="search-mobile" style="display:none;">
+                              <div class="search-feed">
+                                  <input type="search" placeholder="Search...">
+                              </div>
+                              <div class="right-div-content">
+                                  <ul class="trending">
+                                      <li class="r-t"><b>Trending Interests.</b></li>
+                                      <li><button class="side-l"><span class="light-trend">1.2k people near you are interested.</span><br>#COVID-19<br><span class="light-trend">200 posts.</span></button></li>
+                                      <li><button class="side-l"><span class="light-trend">1.2k people near you are interested.</span><br>#Football<br><span class="light-trend">1.2k posts.</span></button></li>
+                                      <li><button class="side-l"><span class="light-trend">1.2k people near you are interested.</span><br>#CR7<br><span class="light-trend">1.4k posts.</span></button></li>
+                                      <li><button class="side-l"><span class="light-trend">1.2k people near you are interested.</span><br>#Messi<br><span class="light-trend">1k posts`.</span></button></li>
+                                      <li><button class="side-l"><span class="light-trend">1.2k people near you are interested.</span><br>#Memes<br><span class="light-trend">1.2k posts.</span></button></li>
+                                      <li><button class="show-m" id="show_trending">Show more</button></li>
+                                  </ul>
+                              </div>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+
+                <!-- buttons -->
+                <td class="bar_buttons">
+                    <div class="dd">
+                        <img src="{% static 'icon/dark.png' %}" id="dark">
+                        <img src="{% static 'icon/light.png' %}" id="light">
+                    </div>
+                    <div class="dd">
+                        <img onclick="myMessage()" class="d3btn" id="b3-i" src="{% static 'icon/message.png' %}">
+                        <img onclick="myMessage()" class="d3btn-a" id="b3-a" src="{% static 'icon/message-active.png' %}">
+                        <span class="badge-message" id="b-m">1</span>
+                        <div id="mydd3" class="dd3-content">
+                            <ul>
+                                {% for i in user %}
+                                <li onclick="window.open('chatbox','_self');">
+                                    <table>
+                                        <td class="msg-img">
+                                            {% if mydetials.profile_pic != '' %}
+                                            <img src="media/{{mydetials.profile_pic}}">
+                                            {% else %}
+                                            <img src="{% static 'img/defaultpp.jpg' %}">
+                                            {% endif %}
+                                        </td>
+                                        <td class="name-msg">{{i.first_name}} {{i.last_name}}<br>
+                                            <p class="light msg_preview">Hello there how are you? Hope you're doing good. When are we meeting</p>
+                                        </td>
+                                    </table>
+                                </li>
+                                {% endfor %}
+                                <li onclick="window.open('chatbox', '_self')" style="color:green">
+                                  See More
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="dd">
+                        <img onclick="myNotification()" class="d2btn" id="b2-i" src="{% static 'icon/notification.png' %}">
+                        <img onclick="myNotification()" class="d2btn-a" id="b2-a" src="{% static 'icon/notification-active.png' %}">
+                        <span class="badge-notification" id="b-n">1</span>
+                        <div id="mydd2" class="dd2-content">
+                            <ul>
+                                {% for i in user %}
+                                <li>
+                                    <table>
+                                        <td><a href=""><img src="{% static 'img/defaultpp.jpg' %}"></a></td>
+                                        <td><a href="">{{i.first_name}} {{i.last_name}} just posted a event you may like.</a>
+                                    </table>
+                                </li>
+                                {% endfor %}
+                                <li onclick="window.open('notification', '_self')" style="color:green">
+                                  See More
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="dd">
+                        {% if mydetials.profile_pic != '' %}
+                        {% block profileheader1 %}
+                        <img onclick="myProfile()" class="d1btn" src="media/{{mydetials.profile_pic}}">
+                        {% endblock %}
+                        {% else %}
+                        <img onclick="myProfile()" class="d1btn" src="{% static 'img/defaultpp.jpg' %}">
+                        {% endif %}
+                        <div id="mydd1" class="dd1-content">
+                            {% for i in user %}
+                            <div class="user_option">
+                                {% if mydetials.profile_pic != '' %}
+                                {% block profileheader2 %}
+                                <img class="pp-show" src="media/{{mydetials.profile_pic}}">
+                                {% endblock %}
+                                {% else %}
+                                <img class="pp-show" src="{% static 'img/defaultpp.jpg' %}">
+                                {% endif %}
+
+                                <!-- <span class="badge-verified"><img src="{% static 'img/not-verified.png' %}" title="Not-Verified" class="nv"></span> -->
+                                <span class="badge-verified"><img src="{% static 'img/verified.png' %}" title="Verified" class="nv"></span>
+
+                                <a href="/profile">
+                                    {{i.first_name}} {{i.last_name}}<br>
+                                    <p class="light">{{email}}</p>
+                                </a>
+                            </div>
+                            {% endfor %}
+                            <!-- <img src="{% static 'icon/logout.png' %}"> -->
+                            <a href="/logout">Logout</a>
+                            <div class="light bd">
+                                &copy 2021 Spotster
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </table>
+        </div>
+
+
+        <!-- feed div -->
+        <div class="feedbody" id="feedb">
+            <div class="sidemenudiv">
+                {% block sidemenudiv %}
+                <div class="d1">
+                    <ul>
+                        <li>
+                            <div class="d1-1" onclick="window.open('profile','_self')">
+                                <table class="ppd1">
+                                    {% for i in user %}
+                                    {% if mydetials.profile_pic != '' %}
+                                    <td><img src="media/{{mydetials.profile_pic}}"></td>
+                                    {% else %}
+                                    <td><img src="{% static 'img/defaultpp.jpg' %}"></td>
+                                    {% endif %}
+                                    <td>{{i.first_name}} {{i.last_name}}</td>
+                                    {% endfor %}
+                                </table>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="d1-1" onclick="window.open('Follower', '_self')">
+                                <table>
+                                    <td><img src="{% static 'icon/follower.png' %}"></td>
+                                    <td>Followers <span>({{count}})</span></td>
+                                </table>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="d1-1" onclick="window.open('Following', '_self')">
+                                <table>
+                                    <td><img src="{% static 'icon/following.png' %}"></td>
+                                    <td>Following <span>({{count_following}})</span></td>
+                                </table>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="d1-1" onclick="window.open('saved', '_self')">
+                                <table>
+                                    <td><img src="{% static 'icon/saved.png' %}"></td>
+                                    <td>Saved</td>
+                                </table>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="d1-1" onclick="window.open('chatbox', '_self')">
+                                <table>
+                                    <td><img src="{% static 'icon/message.png' %}"></td>
+                                    <td>Chatbox</td>
+                                </table>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="mapping">
+                                <div id="map"></div>
+                            </div>
+                            
+                            <script>
+                                if ( navigator.geolocation )
+                                {
+                                    navigator.geolocation.getCurrentPosition( function(position)
+                                    {
+                                        var lng = position.coords.longitude;
+                                        var lat = position.coords.latitude;
+                                        
+                                        $.ajax({
+                                            type: "POST",
+                                            url: 'get_location',
+                                            data: {
+                                            'csrfmiddlewaretoken':$('input[name=csrfmiddlewaretoken]').val(),
+
+                                                "lng": lng,
+                                                "lat": lat,
+                                                
+                                            },
+                                            dataType: "json",});
+                                        // console.log(lng);
+                                        // console.log(lat);
+
+                                        mapboxgl.accessToken = 'pk.eyJ1Ijoic2FtaXI4NDc1MyIsImEiOiJja29mbTFiMGMwbm10MnVyMGs2MGJwM2FyIn0.AVzoRvG6EmclKtdIsSeRkw';
+                                        var map = new mapboxgl.Map({
+                                            container: 'map', // container id
+                                            style: 'mapbox://styles/mapbox/streets-v11',
+                                            center: [lng,lat], // starting position
+                                            zoom: 20 // starting zoom
+                                        });
+
+                                        // Initialize the geolocate control.
+                                        var geolocate = new mapboxgl.GeolocateControl({
+                                        positionOptions: {
+                                            enableHighAccuracy: false
+                                        },
+                                        trackUserLocation: true
+                                        });
+                                        
+                                        // console.log(geolocate)
+                                        // // Add the control to the map.
+                                        map.addControl(geolocate);
+                                        map.addControl(new mapboxgl.FullscreenControl());
+                                         // Create a default Marker and add it to the map.
+                                        
+                                         var d = JSON.parse("{{json_coor|escapejs}}");
+                                        var len_d=d.length;
+                                        for (var i=0; i<len_d; i++){
+                                            new mapboxgl.Marker({ color: '#2d7b20' })
+                                            .setLngLat([d[i][1],d[i][0]])
+                                            .addTo(map);
+                                            
+                                        }
+                                        $.ajax({
+                                            type: "POST",
+                                            url: 'get_location',
+                                            data: {
+                                            'csrfmiddlewaretoken':$('input[name=csrfmiddlewaretoken]').val(),
+
+                                                "lng": lng,
+                                                "lat": lat,
+                                                
+                                            },
+                                            dataType: "json",});
+                                    });
+                                    
+                                }
+
+                            </script>
+                           
+                        </li>
+                    </ul>
+                </div>
+                {% endblock %}
+            </div>
+                  
+            <div class="newsfeed">                
+            {% block searrrrr %}  
+                {% block leftfeed %}
+                {% endblock %}          
+                <div class="right-feed">
+                    <div class="search-feed">
+                        <form method="GET" action="search">
+                            <input type="search" id="searching_names" placeholder="Search..." name="req_name" autocomplete="off" required minlength="1">
+                            <input type="button" id="searching_result" style="display: none;">
+                        </form>
+                    </div>
+                    <script>
+                        document.querySelector('#searching_names').onkeyup = function(e) {
+                        if (e.keyCode === 13) {
+                            document.querySelector('#searching_result').click();
+                            }
+                        }
+                    </script>
+                    <div class="right-div-content">
+                        <ul class="trending">
+                            <li class="r-t"><b>Trending Interests.</b></li>
+                            {% for key,value in trending_hashtags.items %}
+                            {% for k,v in res_dct.items %}
+                            {% if key == k %}
+                            <li><button class="side-l" onclick="window.open('trending?topic={{key}}','_self')"><span class="light-trend">{{value}} posts.</span><br><span id='hashtag-key'>#{{key}}</span><br><span class="light-trend">{{v}} people likes this tag.</span></button></li>
+                            {% endif %}
+                            {% endfor %}
+                            {% endfor %}
+                         
+                           
+                            
+                            <li><button class="show-m" id="show_trending">Show more</button></li>
+                        </ul>
+                    </div>
+                    {% if list_of_id  != None %}
+                    <div class="right-div-content">
+                        <ul class="suggestions">
+                            <li class="r-t"><b>Suggestions.</b></li>
+
+                            {% for i in list_of_id %}
+                            <li>
+                                <form class="un-follow" action="{% url 'discover_more' %}" method="post" id="{{i.pk}}">{% csrf_token %}
+                                    <input type="hidden" class="follow_pk" name="follow_pk" value="{{i.pk}}">
+                                    {% for bio in userdata %}
+                                    {% if bio.owner_id == i.id %}
+                                    <div class="side-l">
+                                        {% if bio.profile_pic != '' %}
+                                        <div class="img-li"><img class="suggest-pp" src="media/{{bio.profile_pic}}"></div>
+                                        {% else %}
+                                        <div class="img-li"><img class="suggest-pp" src="{% static 'img/defaultpp.jpg' %}"></div>
+                                        {% endif %}
+                                    {% endif %}
+                                    {% endfor %}
+                                        <div class="name-li">{{i.first_name}} {{i.last_name}}<br><span class="light-trend">Recommended</span></div>
+                                        <div class="follow-li">
+                                            {% if i in others%}
+                                            <button type="sumbit" id="un_show{{i.pk}}" class="side-after follow{{i.pk}}">Following</button>
+                                            {% else %}
+                                            <button type="submit" class="side-r follow{{i.pk}}">Follow</button>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </form>
+                            </li>
+                            {% endfor %}
+                            <li><button class="show-m" onclick="window.open('discover','_self')">Show more</button></li>            
+                        </ul>
+                    </div>
+                    {% endif %}
+                </div>
+            {% endblock %}
+            </div>      
+        </div>
+        <script src="{% static 'js/newsfeed.js' %}"></script>
+        <script src="{% static 'js/header.js' %}"></script>
+        <script>
+            var light = document.getElementById('light');
+            var dark = document.getElementById('dark');
+
+            var theme = localStorage.getItem('theme');
+            var h_top = document.getElementById('header_css');
+            var layout = document.getElementById('layout_css');
+            var newsfeed = document.getElementById('newsfeed_css');
+            var trending = document.getElementById('trending_css');
+            var discover = document.getElementById('discover_css');
+            var video = document.getElementById('video_css');
+            var profile = document.getElementById('profile_css');
+
+            var cmnt_icon = document.getElementsByClassName('cmnt-icon');
+            var cmnt_icon_count = cmnt_icon.length
+            var cmnt_icon_show = document.getElementsByClassName('cc-icon');
+            var cmnt_icon_show_count = cmnt_icon_show.length
+            var like_icon = document.getElementsByClassName('unlike-icon');
+            var like_icon_count = like_icon.length
+            
+            console.log(cmnt_icon_count, cmnt_icon_show_count, like_icon_count)
+
+            document.getElementById('light_sidemenu').onclick = function()
+            {
+                localStorage.setItem('theme', 'light');
+                dark.style.display='block';
+                light.style.display='none';
+                document.getElementById('light_sidemenu').style.display='none';
+                document.getElementById('dark_sidemenu').style.display='block';
+                h_top.setAttribute("href", "{% static 'css/light/header.css' %}");
+                layout.setAttribute("href", "{% static 'css/light/newsfeed-layout.css' %}");
+                newsfeed.setAttribute("href", "{% static 'css/light/newsfeed.css' %}");
+                trending.setAttribute("href", "{% static 'css/light/trending.css' %}")
+                discover.setAttribute("href","{% static 'css/light/discover.css' %}");
+                profile.setAttribute("href", "{% static 'css/light/profile.css' %}");
+                // document.getElementById('msg-here-text').style.color='black';
+                // document.getElementById('emobox').style.backgroundColor='white';
+                for(var i = 0; i<cmnt_icon_count; i++)
+                {
+                    cmnt_icon[i].style.filter = 'invert(100%)';
+                }
+                for(var i = 0; i<cmnt_icon_show_count; i++)
+                {
+                    cmnt_icon_show[i].style.filter = 'invert(100%)';
+                }
+                for(var i = 0; i<like_icon_count; i++)
+                {
+                    like_icon[i].style.filter = 'invert(100%)';
+                }
+            }
+            document.getElementById('dark_sidemenu').onclick = function()
+            {
+                localStorage.setItem('theme', 'dark');
+                dark.style.display='none';
+                light.style.display='block';
+                document.getElementById('light_sidemenu').style.display='block';
+                document.getElementById('dark_sidemenu').style.display='none';
+                h_top.setAttribute("href", "{% static 'css/dark/header.css' %}");
+                layout.setAttribute("href", "{% static 'css/dark/newsfeed-layout.css' %}");
+                newsfeed.setAttribute("href", "{% static 'css/dark/newsfeed.css' %}");
+                trending.setAttribute("href", "{% static 'css/dark/trending.css' %}");
+                discover.setAttribute("href","{% static 'css/dark/discover.css' %}");
+                profile.setAttribute("href", "{% static 'css/dark/profile.css' %}");
+                // document.getElementById('msg-here-text').style.color='white';
+                // document.getElementById('emobox').style.backgroundColor='black';
+                for(var i = 0; i<cmnt_icon_count; i++)
+                {
+                    cmnt_icon[i].style.filter = 'none';
+                }
+                for(var i = 0; i<cmnt_icon_show_count; i++)
+                {
+                        cmnt_icon_show[i].style.filter = 'none';
+                }
+                for(var i = 0; i<like_icon_count; i++)
+                {
+                    like_icon[i].style.filter = 'none';
+                }
+            }
+
+            light.onclick = function()
+            {
+                localStorage.setItem('theme', 'light');
+                dark.style.display='block';
+                light.style.display='none';
+                document.getElementById('light_sidemenu').style.display='none';
+                document.getElementById('dark_sidemenu').style.display='block';
+                h_top.setAttribute("href", "{% static 'css/light/header.css' %}");
+                layout.setAttribute("href", "{% static 'css/light/newsfeed-layout.css' %}");
+                newsfeed.setAttribute("href", "{% static 'css/light/newsfeed.css' %}");
+                trending.setAttribute("href", "{% static 'css/light/trending.css' %}")
+                discover.setAttribute("href","{% static 'css/light/discover.css' %}");
+                profile.setAttribute("href", "{% static 'css/light/profile.css' %}");
+                // document.getElementById('msg-here-text').style.color='black';
+                // document.getElementById('emobox').style.backgroundColor='white';
+                for(var i = 0; i<cmnt_icon_count; i++)
+                {
+                    cmnt_icon[i].style.filter = 'invert(100%)';
+                }
+                for(var i = 0; i<cmnt_icon_show_count; i++)
+                {
+                    cmnt_icon_show[i].style.filter = 'invert(100%)';
+                }
+                for(var i = 0; i<like_icon_count; i++)
+                {
+                    like_icon[i].style.filter = 'invert(100%)';
+                }
+            }
+
+            dark.onclick = function()
+            {
+                localStorage.setItem('theme', 'dark');
+                dark.style.display='none';
+                light.style.display='block';
+                document.getElementById('light_sidemenu').style.display='block';
+                document.getElementById('dark_sidemenu').style.display='none';
+                h_top.setAttribute("href", "{% static 'css/dark/header.css' %}");
+                layout.setAttribute("href", "{% static 'css/dark/newsfeed-layout.css' %}");
+                newsfeed.setAttribute("href", "{% static 'css/dark/newsfeed.css' %}");
+                trending.setAttribute("href", "{% static 'css/dark/trending.css' %}");
+                discover.setAttribute("href","{% static 'css/dark/discover.css' %}");
+                profile.setAttribute("href", "{% static 'css/dark/profile.css' %}");
+                for(var i = 0; i<cmnt_icon_count; i++)
+                {
+                    cmnt_icon[i].style.filter = 'none';
+                }
+                for(var i = 0; i<cmnt_icon_show_count; i++)
+                {
+                        cmnt_icon_show[i].style.filter = 'none';
+                }
+                for(var i = 0; i<like_icon_count; i++)
+                {
+                    like_icon[i].style.filter = 'none';
+                }
+            }
+            if(theme=='light')
+            {
+                light.style.display='none';
+                document.getElementById('light_sidemenu').style.display='none';
+                h_top.setAttribute("href", "{% static 'css/light/header.css' %}");
+                layout.setAttribute("href", "{% static 'css/light/newsfeed-layout.css' %}");
+                newsfeed.setAttribute("href", "{% static 'css/light/newsfeed.css' %}");
+                trending.setAttribute("href", "{% static 'css/light/trending.css' %}")
+                discover.setAttribute("href","{% static 'css/light/discover.css' %}");
+                profile.setAttribute("href", "{% static 'css/light/profile.css' %}");
+                for(var i = 0; i<cmnt_icon_count; i++)
+                {
+                    cmnt_icon[i].style.filter = 'invert(100%)';
+                }
+                for(var i = 0; i<cmnt_icon_show_count; i++)
+                {
+                    cmnt_icon_show[i].style.filter = 'invert(100%)';
+                }
+                for(var i = 0; i<like_icon_count; i++)
+                {
+                    like_icon[i].style.filter = 'invert(100%)';
+                }
+            }
+            else if(theme=='dark')
+            {
+                dark.style.display='none';
+                document.getElementById('dark_sidemenu').style.display='none';
+                h_top.setAttribute("href", "{% static 'css/dark/header.css' %}");
+                layout.setAttribute("href", "{% static 'css/dark/newsfeed-layout.css' %}");
+                newsfeed.setAttribute("href", "{% static 'css/dark/newsfeed.css' %}");
+                trending.setAttribute("href", "{% static 'css/dark/trending.css' %}");
+                discover.setAttribute("href","{% static 'css/dark/discover.css' %}");
+                profile.setAttribute("href", "{% static 'css/dark/profile.css' %}");
+                for(var i = 0; i<cmnt_icon_count; i++)
+                {
+                    cmnt_icon[i].style.filter = 'none';
+                }
+                for(var i = 0; i<cmnt_icon_show_count; i++)
+                {
+                        cmnt_icon_show[i].style.filter = 'none';
+                }
+                for(var i = 0; i<like_icon_count; i++)
+                {
+                    like_icon[i].style.filter = 'none';
+                }
+            }
+            else
+            {
+                light.style.display='block';
+                dark.style.display='none';
+                document.getElementById('light_sidemenu').style.display='block';
+                document.getElementById('dark_sidemenu').style.display='none';
+                h_top.setAttribute("href", "{% static 'css/dark/header.css' %}");
+                layout.setAttribute("href", "{% static 'css/dark/newsfeed-layout.css' %}");
+                newsfeed.setAttribute("href", "{% static 'css/dark/newsfeed.css' %}");
+                trending.setAttribute("href", "{% static 'css/dark/trending.css' %}");
+                discover.setAttribute("href","{% static 'css/dark/discover.css' %}");
+                profile.setAttribute("href", "{% static 'css/dark/profile.css' %}");
+            }
+        </script>
+    <script>
+    $('.un-follow').submit(function(e){
+        e.preventDefault()
+
+        const follow_id = $(this).attr('id')
+        const followText = $(`.follow${follow_id}`).text()
+        const trim = $.trim(followText)
+        const url =$(this).attr('action')
+        var count_following = parseInt($(`#following-count`).text())
+
+        $.ajax({
+            type:'POST',
+            url : url,
+            data:{
+            'csrfmiddlewaretoken':$('input[name=csrfmiddlewaretoken]').val(),
+            'follow_pk':follow_id
+            },
+            success:function(response){
+            if (trim === 'Follow'){
+                $(`.follow${follow_id}`).text('Following')
+            } else {
+                $(`.follow${follow_id}`).text('Follow')
+            }
+            },
+            error:function(response){
+            console.log('error',response)
+            }
+            });
+
+
+    });
+    </script>
+    </body>
+</html>
